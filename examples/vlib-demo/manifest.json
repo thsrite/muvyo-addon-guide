@@ -1,0 +1,18 @@
+{
+  "api": 1,
+  "id": "alice.picks",
+  "name": "示例片单",
+  "version": "1.0.0",
+  "author": "alice",
+  "description": "虚拟库片单示例：不联网，直接给出几部影片的 TMDB 编号，资料由 Muvyo 补全。",
+  "capabilities": {
+    "vlib": {
+      "lists": [
+        {"key": "classic", "name": "科幻经典", "media_type": "movie"},
+        {"key": "mixed", "name": "混合片单", "media_type": "mixed",
+         "params": [{"key": "kind", "label": "类型", "type": "select",
+                     "options": [{"value": "all", "label": "全部"}, {"value": "movie", "label": "只要电影"}, {"value": "tv", "label": "只要剧集"}]}]}
+      ]
+    }
+  }
+}

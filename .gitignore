@@ -1,0 +1,8 @@
+# 本仓库是说明文档，示例源码需要提交。
+# 你自己的插件仓库请用 template/.gitignore：源码不提交，签名产物（index.json、plugins/）提交。
+
+# 签名凭据里有你的签名私钥，绝不能提交
+muvyo-signing.json
+dist/
+__pycache__/
+.DS_Store

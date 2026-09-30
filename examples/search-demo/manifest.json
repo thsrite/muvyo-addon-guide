@@ -1,0 +1,23 @@
+{
+  "api": 1,
+  "id": "alice.search",
+  "name": "示例搜索",
+  "version": "1.0.0",
+  "author": "alice",
+  "description": "资源搜索插件示例：调用你自己部署的搜索服务，返回网盘分享或磁力链接。",
+  "permissions": {
+    "domains": [],
+    "service": {"label": "搜索服务地址", "help": "你自己部署的搜索服务，例如 http://192.168.1.10:8080"}
+  },
+  "config": [
+    {"key": "api_key", "label": "服务密钥", "type": "secret", "help": "服务没有设置密钥就留空"},
+    {"key": "size", "label": "每次条数", "type": "number", "min": 1, "max": 50, "step": 1, "unit": "条", "default": "20"}
+  ],
+  "settings": {
+    "description": "填写你自己部署的搜索服务地址和密钥。",
+    "sections": [{"title": "服务", "fields": ["api_key"]}, {"title": "结果", "fields": ["size"]}]
+  },
+  "capabilities": {
+    "search": {"link_types": ["115", "magnet"], "supports_tmdb": true}
+  }
+}

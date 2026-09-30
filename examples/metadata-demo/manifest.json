@@ -1,0 +1,10 @@
+{
+  "api": 1,
+  "id": "alice.meta",
+  "name": "示例刮削",
+  "version": "1.0.0",
+  "author": "alice",
+  "description": "刮削来源示例：按片名搜索影视，给出简介、评分、演职员与分季分集资料。",
+  "permissions": {"domains": ["api.example.com", "img.example.com"]},
+  "capabilities": {"metadata": {"media_types": ["movie", "tv"]}}
+}

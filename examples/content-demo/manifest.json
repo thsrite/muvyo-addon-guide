@@ -1,0 +1,16 @@
+{
+  "api": 1,
+  "id": "alice.content",
+  "name": "示例内容源",
+  "version": "1.0.0",
+  "author": "alice",
+  "description": "内容源示例：连接用户自己部署的内容服务，在 Vyo 里按虚拟库浏览和播放作品。",
+  "permissions": {
+    "domains": [],
+    "service": {"label": "内容服务地址", "help": "你部署的内容服务地址，例如 http://192.168.1.10:8788"}
+  },
+  "config": [
+    {"key": "api_key", "label": "服务密钥", "type": "secret", "help": "服务没有设置密钥就留空"}
+  ],
+  "capabilities": {"content": {"categories": true, "search": true}}
+}

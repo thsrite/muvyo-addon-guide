@@ -8,7 +8,7 @@
   "entry": "main.js",
   "permissions": {"domains": []},
   "config": [
-    {"key": "separator", "label": "音频字段分隔符", "type": "select", "options": [".", " ", "-"], "default": "."}
+    {"key": "separator", "label": "音频字段分隔符", "type": "select", "options": [{"value": ".", "label": "点号"}, {"value": " ", "label": "空格"}, {"value": "-", "label": "连字符"}], "default": "."}
   ],
   "capabilities": {"naming": {"media_types": ["movie", "tv"]}}
 }

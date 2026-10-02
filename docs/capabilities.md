@@ -8,6 +8,7 @@
 - [vlib 虚拟库片单](#vlib-虚拟库片单)
 - [content 内容源](#content-内容源)
 - [metadata 刮削来源](#metadata-刮削来源)
+- [naming 整理命名（待发布）](naming.md) — 独立协议；返回对象或 `null`，未知字段拒绝，不适用上面的单条丢弃规则
 
 ---
 

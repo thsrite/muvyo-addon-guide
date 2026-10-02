@@ -1,0 +1,14 @@
+{
+  "api": 1,
+  "id": "alice.naming",
+  "name": "示例整理命名",
+  "version": "1.0.0",
+  "author": "alice",
+  "description": "演示音频编码字段格式化、沿用原模板渲染和 JavaScript 正则替换，不操作文件。",
+  "entry": "main.js",
+  "permissions": {"domains": []},
+  "config": [
+    {"key": "separator", "label": "音频字段分隔符", "type": "select", "options": [".", " ", "-"], "default": "."}
+  ],
+  "capabilities": {"naming": {"media_types": ["movie", "tv"]}}
+}

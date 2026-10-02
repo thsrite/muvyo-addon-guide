@@ -1,6 +1,6 @@
 # Muvyo 第三方插件开发指南
 
-这里是给 Muvyo 写第三方插件的参考：怎么写、怎么签名、怎么发布成插件仓库，以及四类能力各自的接口。
+这里是给 Muvyo 写第三方插件的参考：怎么写、怎么签名、怎么发布成插件仓库，以及各类能力的接口与示例。
 
 > 第三方插件不是 Muvyo 官方出品。插件在 Muvyo 的独立沙箱进程里运行，只能访问安装时管理员确认过的域名，读不到 Muvyo 的配置、凭据和本机文件（见 [安全机制](docs/security.md)）。
 >
@@ -14,6 +14,7 @@
 | `vlib` 虚拟库片单 | 作为虚拟库的动态来源，给出一组影片，资料由 Muvyo 从 TMDB 补全 | `vlibItems` |
 | `content` 内容源 | 在 Vyo 里按虚拟库浏览、播放插件提供的作品 | `contentList`、`contentDetail`、`contentPlay`，可选 `contentCategories`、`contentSearch` |
 | `metadata` 刮削来源 | Vyo 媒体库补全资料、重新识别时可改用插件 | `metadataSearch`、`metadataDetail` |
+| `naming` 整理命名（待发布） | 为整理命名方案提供字段格式化和相对路径建议，不操作文件 | `naming` |
 
 一个插件可以同时声明多种能力。详细的参数和返回格式见 [docs/capabilities.md](docs/capabilities.md)。
 
@@ -93,11 +94,12 @@ git push
 
 - [docs/manifest.md](docs/manifest.md) — manifest.json 全部字段、配置项与设置页
 - [docs/runtime.md](docs/runtime.md) — 运行环境：`mv.fetch`、`mv.config`、`mv.storage`、日志与限制
-- [docs/capabilities.md](docs/capabilities.md) — 四类能力的函数、参数与返回格式
+- [docs/capabilities.md](docs/capabilities.md) — 已有四类能力的函数、参数与返回格式
+- [docs/naming.md](docs/naming.md) — 整理命名协议（待发布）：返回格式、`mv.render` 与隔离限制
 - [docs/publishing.md](docs/publishing.md) — 签名、加密、插件仓库格式、更新与停用
 - [docs/security.md](docs/security.md) — 安全机制：独立沙箱进程、联网代办、签名与更新校验、加密
 - [docs/policy.md](docs/policy.md) — 开发者协议与内容政策：禁止的插件、代码许可、停用与申诉
-- [examples/](examples/) — 四个可直接改的示例
+- [examples/](examples/) — 五个教学示例；命名示例需要支持新协议的 Muvyo
 - [template/](template/) — 插件仓库模板：`.gitignore`（源码不提交、签名产物提交）、提交检查钩子、发布用的 AI skill
 
 ## 常见问题

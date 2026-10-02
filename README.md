@@ -32,6 +32,10 @@
 
 一个 GitHub 仓库就是一个插件仓库。推荐结构：源码放 `src/` 不提交，签名产物放仓库根目录提交。直接复制 [template/](template/) 开始（连同隐藏的 `.gitignore`、`.githooks/`、`.claude/`），然后执行 `git config core.hooksPath .githooks` 启用提交检查：
 
+**推荐不要上传 `src/`。** 本地同一个目录里可以同时放 `src/` 和 `plugins/`：前者用于开发，由 `.gitignore` 忽略；后者存放加密签名产物，发布时只提交 `index.json`、`index.json.sig` 和 `plugins/`。不需要为了发布额外维护分支或拆分仓库。被忽略的源码不会保存在这个仓库的 Git 历史或 GitHub 上，请自行备份。
+
+如果 `src/` 已被 Git 跟踪，之后添加 `.gitignore` 不会让它停止被跟踪；即使从当前版本移除，历史提交里的源码仍然存在。已经上传到公开仓库的源码，不能靠补一条忽略规则变回私密。
+
 ```
 my-addons/                     ← 你的 GitHub 仓库
   .gitignore                   忽略 src/、签名凭据、签名脚本
@@ -62,25 +66,27 @@ python3 mv_addon.py sign ./src/alice.search -o .
 ```
 index.json                     插件清单，每次签名自动更新
 plugins/alice.search/
-  encrypted.json               加密后的代码（加 --no-encrypt 时是明文 main.js）
+  encrypted.json               加密后的代码（发布时必须保留加密）
   manifest.json
   README.md
   signature.json               作者签名
 ```
 
-默认会加密代码；开源插件加 `--no-encrypt`，也可以把 `src/` 从 .gitignore 里去掉一起公开。检查签名：`python3 mv_addon.py verify ./plugins/alice.search`。
+发布流程只上传加密并签名后的插件产物，不上传 `src/`、明文入口 JS 或源码压缩包，不使用 `--no-encrypt`。源码留在本地或独立的私有开发仓库；不要移除 `.gitignore` 的 `src/` 规则。检查签名：`python3 mv_addon.py verify ./plugins/alice.search`。
 
 **4. 发布**
 
+插件签名完成后，按 [仓库签名步骤](docs/publishing.md#仓库签名) 生成并验证 `index.json.sig`。模板提供独立索引签名工具；已有仓库必须使用原仓库私钥。
+
 ```sh
-git add index.json plugins
+git add index.json index.json.sig plugins
 git commit -m "发布 alice.search 1.0.0"
 git push
 ```
 
 仓库要是公开的，`index.json` 在仓库根目录。
 
-提交检查会拦下 `src/` 源码、`muvyo-signing.json`、任何含私钥的文件、插件目录里的多余文件，以及加密插件夹带的明文 JS。开源插件要连源码一起提交，先执行 `git config muvyo.publishSource true`。
+提交检查会拦下 `src/` 源码、`muvyo-signing.json`、任何含私钥的文件、插件目录里的多余文件、明文 JS，以及缺少加密代码的插件。许可证名称不改变此发布流程；不要根据仓库里有开源许可证就上传源码或关闭加密。本指南的 `examples/` 是公开教学示例，不代表开发者的插件源码也应上传。
 
 用 Claude Code 等 AI 编程工具开发时，模板里的 skill 会按「签名 → 验签 → 只暂存签名产物 → 提交 → 确认后推送」的流程完成发布，直接说「发布插件」即可。
 

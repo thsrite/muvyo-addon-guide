@@ -15,3 +15,9 @@
 ```sh
 python3 mv_addon.py sign ./src/<你的用户名>.picks -o .
 ```
+
+**推荐 `src/` 不要上传到 GitHub。** 本指南公开的是教学示例；你开发的插件源码放在本地 `src/`，使用 [模板的 .gitignore](../template/.gitignore) 忽略即可。本地可以同时有 `src/` 和 `plugins/`，无需额外维护分支或拆分仓库。
+
+按 [发布说明](../docs/publishing.md#仓库签名) 完成仓库索引签名后，只提交 `index.json`、`index.json.sig` 和 `plugins/` 下的加密签名产物，不提交源码、签名凭据或私钥。被忽略的源码没有这个仓库的 Git 历史，也不会备份到 GitHub，请自行备份。
+
+注意：`.gitignore` 对已被 Git 跟踪的源码无效；从当前版本删除源码也不会清除历史提交。已经公开过的源码，不能靠补忽略规则变回私密。

@@ -10,11 +10,11 @@
     README.md          可选
 
   python3 mv_addon.py sign ./my-plugin                 # 加密代码并签名，写入插件库目录 ./dist（可用 -o 指定）
-  python3 mv_addon.py sign ./my-plugin --no-encrypt    # 不加密（开源插件）
   python3 mv_addon.py verify ./dist/plugins/alice.search
 
-签名结果是一个插件库：index.json + plugins/<插件ID>/（manifest.json、main.js 或加密后的 encrypted.json、
-README.md、signature.json）。把整个目录推到 GitHub 仓库，Muvyo 里添加这个仓库地址就能安装。
+签名结果是一个插件库：index.json + plugins/<插件ID>/（manifest.json、加密后的 encrypted.json、
+README.md、signature.json）。只上传这些加密签名产物，不上传 src、明文代码或签名凭据。
+源码留在本地或独立私有开发仓库；发布流程不使用 --no-encrypt。Muvyo 里添加插件仓库地址就能安装。
 凭据里有签名私钥：妥善保管，不要提交到仓库或发给别人；丢了就在 Muvyo 里重新领取，旧证书签过的插件照样有效。
 """
 import argparse
@@ -165,7 +165,7 @@ def sign(args):
     entry = manifest.get("entry", "main.js")
     if not args.no_encrypt:
         if not cert.get("content_key"):
-            raise SystemExit("这张证书不支持加密，请在 Muvyo 里重新领取证书，或加 --no-encrypt 不加密")
+            raise SystemExit("这张证书不支持加密，请在 Muvyo 里重新领取证书后再签名发布")
         files[ENCRYPTED_FILE] = seal(files.pop(entry), manifest, cert)
     payload = {"plugin_id": plugin_id, "version": version,
                "files": {name: hashlib.sha256(data).hexdigest() for name, data in sorted(files.items())}}

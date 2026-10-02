@@ -1,7 +1,6 @@
 #!/bin/sh
 # Muvyo 插件仓库的提交检查：拦住源码、签名凭据和私钥，只放行签名产物。
 # 启用：git config core.hooksPath .githooks
-# 开源插件要一起提交源码：git config muvyo.publishSource true
 
 fail=0
 say() { printf '%s\n' "$*" >&2; }
@@ -10,17 +9,13 @@ say() { printf '%s\n' "$*" >&2; }
 staged=$(git -c core.quotePath=false diff --cached --name-only --diff-filter=ACMR)
 [ -z "$staged" ] && exit 0
 
-publish_source=$(git config --bool muvyo.publishSource 2>/dev/null || echo false)
-
 while IFS= read -r f; do
   [ -n "$f" ] || continue
   base=${f##*/}
   case "$f" in
     src/*)
-      if [ "$publish_source" != "true" ]; then
-        say "✗ ${f}：src/ 是插件源码，不能提交（开源插件先执行 git config muvyo.publishSource true）"
-        fail=1
-      fi ;;
+      say "✗ ${f}：src/ 只用于本地开发，插件仓库只发布加密签名产物"
+      fail=1 ;;
   esac
   case "$base" in
     muvyo-signing.json|*signing*.json|*.pem|*.key)
@@ -33,8 +28,8 @@ while IFS= read -r f; do
       fail=1 ;;
     plugins/*/*)
       case "$base" in
-        manifest.json|README.md|signature.json|encrypted.json|*.js) ;;
-        *) say "✗ ${f}：插件目录里只能有 manifest.json、入口 JS 或 encrypted.json、README.md、signature.json"
+        manifest.json|README.md|signature.json|encrypted.json) ;;
+        *) say "✗ ${f}：插件目录里只能有 manifest.json、encrypted.json、README.md、signature.json，不得上传明文 JS"
            fail=1 ;;
       esac ;;
   esac
@@ -47,11 +42,15 @@ done <<EOF
 $staged
 EOF
 
-# 按暂存区检查每个改动的插件目录：必须有签名，加密插件不能同时带明文入口
+# 按暂存区检查每个改动的插件目录：必须有加密代码和签名，不能带明文入口
 dirs=$(printf '%s\n' "$staged" | sed -n 's#^\(plugins/[^/]*\)/.*#\1#p' | sort -u)
 while IFS= read -r dir; do
   [ -n "$dir" ] || continue
-  if [ -n "$(git ls-files -- "$dir/encrypted.json")" ] && [ -n "$(git ls-files -- "$dir/*.js")" ]; then
+  if [ -z "$(git ls-files -- "$dir/encrypted.json")" ]; then
+    say "✗ ${dir}：没有 encrypted.json，请使用默认加密方式重新签名"
+    fail=1
+  fi
+  if [ -n "$(git ls-files -- "$dir/*.js")" ]; then
     say "✗ ${dir}：已加密的插件目录里还有明文 JS，请重新签名并 git add -A $dir"
     fail=1
   fi

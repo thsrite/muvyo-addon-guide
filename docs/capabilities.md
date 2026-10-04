@@ -317,7 +317,7 @@ Vyo 媒体库的扫描设置里可以把「资料来源」改成插件（插件�
 
 接收 Emby、Jellyfin、Plex 发到 Muvyo「Webhook 接收」的事件，例如把观看记录同步到别的网站、入库后通知自己的服务。各家的事件名由 Muvyo 统一成下表的名字后再交给插件。
 
-两道开关都打开才会收到：Muvyo「设置 → Webhook 接收」里允许了这个事件类型；管理员在插件设置里打开了 **接收 Webhook 事件**（安装后默认关）。
+两道开关都打开才会收到：Muvyo「设置 → Webhook 接收」里允许了这个事件类型；管理员在插件设置里打开了 **接收 Webhook 事件**（安装后默认关）。发新版时如果 `events` 里新增了事件，更新确认窗口会列出来，更新后这个开关会被自动关掉，等管理员重新打开；只减少或不改事件不受影响。
 
 ### 声明
 
@@ -331,11 +331,13 @@ Vyo 媒体库的扫描设置里可以把「资料来源」改成插件（插件�
 |---|---|
 | `library.new` | 新入库 |
 | `library.deleted` | 删除（Emby 的深度删除也归到这里） |
-| `playback.start` / `playback.stop` | 开始 / 停止播放（Plex 看完 90% 也算停止播放） |
+| `playback.start` / `playback.stop` | 开始 / 停止播放 |
 | `playback.pause` / `playback.unpause` | 暂停 / 继续播放 |
-| `item.markplayed` / `item.markunplayed` | 标为已看 / 未看 |
+| `item.markplayed` / `item.markunplayed` | 标为已看 / 未看（Plex 看完 90% 记为标为已看） |
 | `item.rate` | 评分 |
-| `system.notificationtest` | 媒体服务器的「发送测试通知」 |
+| `system.notificationtest` | 媒体服务器的「发送测试通知」（Jellyfin 的待重启、计划任务完成不算） |
+
+Plex 的暂停 / 继续在「Webhook 接收」里归为 `playback.progress`、评分归为 `library.updated`，要在那里允许这两种类型，插件才收得到对应事件。
 
 只能声明表里的事件，不能重复；播放进度这类高频事件不开放。
 
@@ -365,8 +367,8 @@ Vyo 媒体库的扫描设置里可以把「资料来源」改成插件（插件�
 返回值被忽略，返回 `null` 即可；抛出错误会显示在插件卡片上。
 
 - **不提供**文件路径、来源 IP、原始报文和令牌。
-- 投递在后台进行，媒体服务器不等待插件。单次最多 30 秒（不超过管理员设置的执行时限）；插件忙或排队过多时这次事件直接丢弃，不补发。需要可靠同步时在 `mv.storage` 里记下进度，配合定时任务（`capabilities.tasks`）补齐。
-- 同一条目可能连续来几次事件（例如删除时 Emby 原生事件和深度删除各一次），按 `item.id` 与时间自己去重。
+- 投递在后台进行，媒体服务器不等待插件。单次最多 30 秒（不超过管理员设置的执行时限）；每个插件同时最多处理 2 个事件，再多的直接丢弃、不补发，这样事件不会挤占插件的搜索、播放等调用。需要可靠同步时在 `mv.storage` 里记下进度，配合定时任务（`capabilities.tasks`）补齐。
+- 同一条目可能连续来几次事件（例如删除时 Emby 原生事件和深度删除各一次；Plex 看完一集会先后收到 `item.markplayed` 和 `playback.stop`），按 `item.id` 与时间自己去重。
 - 用户名、设备名属于观看记录，只发给用户自己配置、确实需要的服务。
 
 示例见 [examples/webhook-demo](../examples/webhook-demo/)。

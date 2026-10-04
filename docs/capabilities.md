@@ -8,6 +8,7 @@
 - [vlib 虚拟库片单](#vlib-虚拟库片单)
 - [content 内容源](#content-内容源)
 - [metadata 刮削来源](#metadata-刮削来源)
+- [webhook 事件](#webhook-事件) — 只接收事件，返回值被忽略
 - [naming 整理命名（待发布）](naming.md) — 独立协议；返回对象或 `null`，未知字段拒绝，不适用上面的单条丢弃规则
 
 ---
@@ -309,3 +310,63 @@ Vyo 媒体库的扫描设置里可以把「资料来源」改成插件（插件�
 ```
 
 图片只记下地址，展示时由 Muvyo 按插件的联网权限取回并缓存，所以图片域名也要写进 `permissions.domains`。取图请求头不能带 `Cookie`、`Authorization` 等凭据类头。
+
+---
+
+## webhook 事件
+
+接收 Emby、Jellyfin、Plex 发到 Muvyo「Webhook 接收」的事件，例如把观看记录同步到别的网站、入库后通知自己的服务。各家的事件名由 Muvyo 统一成下表的名字后再交给插件。
+
+两道开关都打开才会收到：Muvyo「设置 → Webhook 接收」里允许了这个事件类型；管理员在插件设置里打开了 **接收 Webhook 事件**（安装后默认关）。
+
+### 声明
+
+```json
+"capabilities": {
+  "webhook": {"events": ["library.new", "playback.stop"]}
+}
+```
+
+| 事件 | 含义 |
+|---|---|
+| `library.new` | 新入库 |
+| `library.deleted` | 删除（Emby 的深度删除也归到这里） |
+| `playback.start` / `playback.stop` | 开始 / 停止播放（Plex 看完 90% 也算停止播放） |
+| `playback.pause` / `playback.unpause` | 暂停 / 继续播放 |
+| `item.markplayed` / `item.markunplayed` | 标为已看 / 未看 |
+| `item.rate` | 评分 |
+| `system.notificationtest` | 媒体服务器的「发送测试通知」 |
+
+只能声明表里的事件，不能重复；播放进度这类高频事件不开放。
+
+### webhookEvent(e)
+
+```js
+{
+  event: "playback.stop",
+  source: "emby",              // emby / jellyfin / plex
+  server: "家里的 Emby",        // 媒体服务器名称
+  user: "bob",                 // 用户名，事件没有时为空串
+  device: "客厅电视",           // 设备名，事件没有时为空串
+  item: {
+    id: "12345",               // 媒体服务器里的条目 ID
+    type: "Episode",           // Movie / Series / Season / Episode 等
+    name: "试播集",
+    series_name: "绝命毒师",
+    season: 1,                 // 季集号、年份没有时为 null
+    episode: 1,
+    year: 2008,
+    provider_ids: { tmdb: "1396" }   // 只含 tmdb / imdb / tvdb；单集事件里是单集自己的编号
+  },
+  time: "2026-10-04T21:30:00+08:00"  // Muvyo 收到事件的时间
+}
+```
+
+返回值被忽略，返回 `null` 即可；抛出错误会显示在插件卡片上。
+
+- **不提供**文件路径、来源 IP、原始报文和令牌。
+- 投递在后台进行，媒体服务器不等待插件。单次最多 30 秒（不超过管理员设置的执行时限）；插件忙或排队过多时这次事件直接丢弃，不补发。需要可靠同步时在 `mv.storage` 里记下进度，配合定时任务（`capabilities.tasks`）补齐。
+- 同一条目可能连续来几次事件（例如删除时 Emby 原生事件和深度删除各一次），按 `item.id` 与时间自己去重。
+- 用户名、设备名属于观看记录，只发给用户自己配置、确实需要的服务。
+
+示例见 [examples/webhook-demo](../examples/webhook-demo/)。

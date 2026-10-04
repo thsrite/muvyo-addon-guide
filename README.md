@@ -15,6 +15,7 @@
 | `content` 内容源 | 在 Vyo 里按虚拟库浏览、播放插件提供的作品 | `contentList`、`contentDetail`、`contentPlay`，可选 `contentCategories`、`contentSearch` |
 | `metadata` 刮削来源 | Vyo 媒体库补全资料、重新识别时可改用插件 | `metadataSearch`、`metadataDetail` |
 | `naming` 整理命名（待发布） | 为整理命名方案提供字段格式化和相对路径建议，不操作文件 | `naming` |
+| `webhook` 事件（待发布） | 接收 Emby / Jellyfin / Plex 的入库、删除、播放、标记已看等事件 | `webhookEvent` |
 
 一个插件可以同时声明多种能力。详细的参数和返回格式见 [docs/capabilities.md](docs/capabilities.md)。
 
@@ -100,12 +101,12 @@ git push
 
 - [docs/manifest.md](docs/manifest.md) — manifest.json 全部字段、配置项与设置页
 - [docs/runtime.md](docs/runtime.md) — 运行环境：`mv.fetch`、`mv.config`、`mv.storage`、日志与限制
-- [docs/capabilities.md](docs/capabilities.md) — 已有四类能力的函数、参数与返回格式
+- [docs/capabilities.md](docs/capabilities.md) — 各类能力的函数、参数与返回格式
 - [docs/naming.md](docs/naming.md) — 整理命名协议（待发布）：返回格式、`mv.render` 与隔离限制
 - [docs/publishing.md](docs/publishing.md) — 签名、加密、插件仓库格式、更新与停用
 - [docs/security.md](docs/security.md) — 安全机制：独立沙箱进程、联网代办、签名与更新校验、加密
 - [docs/policy.md](docs/policy.md) — 开发者协议与内容政策：禁止的插件、代码许可、停用与申诉
-- [examples/](examples/) — 五个教学示例；命名示例需要支持新协议的 Muvyo
+- [examples/](examples/) — 六个教学示例；命名与 Webhook 事件示例需要支持新协议的 Muvyo
 - [template/](template/) — 插件仓库模板：`.gitignore`（源码不提交、签名产物提交）、提交检查钩子、发布用的 AI skill
 
 ## 常见问题

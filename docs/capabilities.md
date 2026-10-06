@@ -8,7 +8,7 @@
 - [vlib 虚拟库片单](#vlib-虚拟库片单)
 - [content 内容源](#content-内容源)
 - [metadata 刮削来源](#metadata-刮削来源)
-- [webhook 事件](#webhook-事件) — 只接收事件，返回值被忽略
+- [webhook 事件](#webhook-事件) — 接收 Muvyo 自己的事件，返回值被忽略
 - [naming 整理命名（待发布）](naming.md) — 独立协议；返回对象或 `null`，未知字段拒绝，不适用上面的单条丢弃规则
 
 ---
@@ -315,60 +315,66 @@ Vyo 媒体库的扫描设置里可以把「资料来源」改成插件（插件�
 
 ## webhook 事件
 
-接收 Emby、Jellyfin、Plex 发到 Muvyo「Webhook 接收」的事件，例如把观看记录同步到别的网站、入库后通知自己的服务。各家的事件名由 Muvyo 统一成下表的名字后再交给插件。
+Muvyo 自己的上传、STRM 生成、同步与扫描、整理、订阅、下载、备份完成或失败时，以及收到媒体服务器 Webhook 时，把事件交给插件。例如整理完成后通知自己的服务、把下载失败记到别的网站。事件名与 Muvyo「Webhook 推送」相同，但两者互不依赖：不用开「Webhook 推送」，也不用开「Webhook 接收」。
 
-两道开关都打开才会收到：Muvyo「设置 → Webhook 接收」里允许了这个事件类型；管理员在插件设置里打开了 **接收 Webhook 事件**（安装后默认关）。发新版时如果 `events` 里新增了事件，更新确认窗口会列出来，更新后这个开关会被自动关掉，等管理员重新打开；只减少或不改事件不受影响。
+管理员要在插件设置里打开 **接收 Muvyo 事件**（安装后默认关）才会收到。发新版时如果 `events` 里新增了事件，更新确认窗口会列出来，更新后这个开关会被自动关掉，等管理员重新打开；只减少或不改事件不受影响。
 
 ### 声明
 
 ```json
 "capabilities": {
-  "webhook": {"events": ["library.new", "playback.stop"]}
+  "webhook": {"events": ["organize.completed", "download.failed"]}
 }
 ```
 
 | 事件 | 含义 |
 |---|---|
-| `library.new` | 新入库 |
-| `library.deleted` | 删除（Emby 的深度删除也归到这里） |
-| `playback.start` / `playback.stop` | 开始 / 停止播放 |
-| `playback.pause` / `playback.unpause` | 暂停 / 继续播放 |
-| `item.markplayed` / `item.markunplayed` | 标为已看 / 未看（Plex 看完 90% 记为标为已看） |
-| `item.rate` | 评分 |
-| `system.notificationtest` | 媒体服务器的「发送测试通知」（Jellyfin 的待重启、计划任务完成不算） |
+| `media.uploaded` / `media.upload_failed` / `media.upload_skipped` | 上传成功 / 失败 / 跳过 |
+| `strm.generated` / `strm.failed` | STRM 生成 / 失败（全量生成会逐个文件报，量很大） |
+| `library.sync_completed` / `library.sync_failed` | 文件同步、媒体库扫描完成 / 失败 |
+| `organize.completed` / `organize.failed` | 整理完成 / 失败 |
+| `subscription.completed` / `subscription.failed` | 订阅完成 / 失败 |
+| `download.completed` / `download.failed` | 下载、云盘离线、BT 下载完成 / 失败 |
+| `backup.completed` / `backup.failed` | 备份完成 / 失败 |
+| `webhook.received` | 收到媒体服务器（Emby / Jellyfin / Plex）的 Webhook |
 
-Plex 的暂停 / 继续在「Webhook 接收」里归为 `playback.progress`、评分归为 `library.updated`，要在那里允许这两种类型，插件才收得到对应事件。
-
-只能声明表里的事件，不能重复；播放进度这类高频事件不开放。
+只能声明表里的事件，不能重复。v3.9.14–v3.9.15 开放过的媒体服务器事件（`library.new`、`library.deleted`、`playback.*`、`item.*`、`system.notificationtest`）已下线：旧包里的这些声明安装时忽略，不报错也不再投递。
 
 ### webhookEvent(e)
 
 ```js
 {
-  event: "playback.stop",
-  source: "emby",              // emby / jellyfin / plex
-  server: "家里的 Emby",        // 媒体服务器名称
-  user: "bob",                 // 用户名，事件没有时为空串
-  device: "客厅电视",           // 设备名，事件没有时为空串
-  item: {
-    id: "12345",               // 媒体服务器里的条目 ID
-    type: "Episode",           // Movie / Series / Season / Episode 等
-    name: "试播集",
-    series_name: "绝命毒师",
-    season: 1,                 // 季集号、年份没有时为 null
-    episode: 1,
-    year: 2008,
-    provider_ids: { tmdb: "1396" }   // 只含 tmdb / imdb / tvdb；单集事件里是单集自己的编号
-  },
-  time: "2026-10-04T21:30:00+08:00"  // Muvyo 收到事件的时间
+  event: "organize.completed",
+  time: "2026-10-06T21:30:00+08:00",  // Muvyo 转交事件的时间
+  data: {                             // 只含这次事件实际带的字段
+    source: "organize",               // 来源模块：upload / strm / file_sync / media_library / organize /
+                                      // subscription / media_download / bt_downloader / cloud_offline / backup / webhook 等
+    status: "processed",              // 结果状态
+    title: "绝命毒师",
+    media_type: "tv",                 // movie / tv
+    tmdb_id: 1396,
+    season: 1,
+    file_name: "Breaking.Bad.S01E01.mkv",  // 只有文件名，不含目录
+    storage_type: "115"               // 网盘类型，不是具体账号
+  }
 }
 ```
 
+`data` 可能出现的字段：
+
+| 字段 | 含义 |
+|---|---|
+| `source`、`status`、`reason` | 来源模块、结果状态、失败原因代码（如 `search_failed`） |
+| `title`、`media_type`、`tmdb_id`、`season`、`episode`、`year` | 作品信息 |
+| `file_name`、`storage_type` | 文件名、网盘类型 |
+| `library_name`、`backup_type` | 媒体库名称、备份类型（`local` / `cloud`） |
+| `size`、`files`、`directories`、`created`、`skipped`、`failed`、`success`、`completed`、`total`、`elapsed` | 体积（字节）、数量、耗时（秒） |
+| `event_type`、`item_name`、`item_type`、`server` | 仅 `webhook.received`：媒体服务器的事件名、条目名、条目类型、来源（emby / jellyfin / plex） |
+
 返回值被忽略，返回 `null` 即可；抛出错误会显示在插件卡片上。
 
-- **不提供**文件路径、来源 IP、原始报文和令牌。
-- 投递在后台进行，媒体服务器不等待插件。单次最多 30 秒（不超过管理员设置的执行时限）；每个插件同时最多处理 2 个事件，再多的直接丢弃、不补发，这样事件不会挤占插件的搜索、播放等调用。需要可靠同步时在 `mv.storage` 里记下进度，配合定时任务（`capabilities.tasks`）补齐。
-- 同一条目可能连续来几次事件（例如删除时 Emby 原生事件和深度删除各一次；Plex 看完一集会先后收到 `item.markplayed` 和 `playback.stop`），按 `item.id` 与时间自己去重。
-- 用户名、设备名属于观看记录，只发给用户自己配置、确实需要的服务。
+- **不提供**文件路径、目录、网盘账号、任务与记录编号。
+- 投递在后台进行，Muvyo 不等待插件。单次最多 30 秒（不超过管理员设置的执行时限）；每个插件同时最多处理 2 个事件，再多的直接丢弃、不补发，这样事件不会挤占插件的搜索、播放等调用。需要可靠同步时在 `mv.storage` 里记下进度，配合定时任务（`capabilities.tasks`）补齐。
+- 字段缺失是常态（例如订阅搜索失败可能没有片名），用之前先判断。
 
 示例见 [examples/webhook-demo](../examples/webhook-demo/)。

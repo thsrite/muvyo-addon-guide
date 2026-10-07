@@ -187,7 +187,7 @@
 
 每页条数由插件决定，但要保持一致；不知道总数时可以不给 `total` / `page_count`，Muvyo 翻到空页或重复页为止。
 
-### contentCategories({})
+### contentCategories({ library_category })
 
 ```js
 { categories: [ { id: "movie", title: "电影" }, { id: "series", title: "剧集" } ] }
@@ -195,9 +195,11 @@
 
 最多 100 个；分类 ID 规则同作品 ID。管理员建内容库时可以选定一个分类。
 
-### contentSearch({ keyword, page })
+`library_category` 只在浏览某个内容库时出现，是这个库选定的分类 ID；管理员建库挑分类时不带这个参数。插件同时接了几个内容来源时，可以在建库时列出全部来源的分类（如「来源 A · 热门」「来源 B · 最新」），浏览某个库时只返回与 `library_category` 同一来源的分类，库里的分类标签就不会混进别的来源。不需要分组的插件忽略这个参数即可。
 
-返回格式同 `contentList`。
+### contentSearch({ keyword, category, page })
+
+返回格式同 `contentList`。`category` 是这个内容库选定的分类 ID（没选时为空串），接了多个内容来源的插件可以据此只搜对应来源。
 
 ### contentDetail({ id })
 
@@ -235,6 +237,12 @@
 ```
 
 播放地址可能有时效，Muvyo 只复用 60 秒。
+
+`url` 可以是视频文件，也可以是 HLS 播放列表（`.m3u8`）。给播放列表时把 `media.container` 写成 `"m3u8"`，客户端才会按 HLS 打开。Muvyo 会读出播放列表，把里面的子播放列表、分片和解密密钥地址都换成 Muvyo 自己的转接地址，播放器只和 Muvyo 通信；取每一段时同样只能访问插件声明并经管理员确认的域名（或服务地址），`headers` 也会带上。限制：
+
+- 分片必须返回媒体类型（如 `video/mp2t`、`video/mp4`），解密密钥不超过 4 KB；
+- 播放列表里只能是 `http(s)` 地址，出现 `skd://`、`data:` 等地址时整份不播放；
+- 不支持 DASH（`.mpd`）。
 
 ---
 

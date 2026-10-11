@@ -46,7 +46,7 @@
 | `description` | 否 | 简介，≤ 500 字，可换行 |
 | `entry` | 否 | 入口文件名，默认 `main.js`，只能是 `xxx.js` |
 | `icon` | 否 | 包内静态 PNG / JPEG / WebP 文件名，例如 `icon.png`；需要支持图标的新版本 Muvyo，v3.9.9 不支持 |
-| `permissions` | 否 | 联网权限，见下 |
+| `permissions` | 否 | 联网权限与使用 Muvyo 的服务，见下 |
 | `config` | 否 | 配置项，最多 30 个，见下 |
 | `settings` | 否 | 设置页的说明、链接与分组，见下 |
 | `capabilities` | 是 | 至少声明一种能力，见 [capabilities.md](capabilities.md) |
@@ -79,6 +79,31 @@
   - 不能直接访问 IP 地址；域名解析到内网、本机的地址会被拒绝。
   - 安装时管理员会看到这份清单并确认，插件只能访问确认过的域名。
 - `service`：插件需要用户提供一个服务地址时声明（例如用户自己部署的服务）。用户在插件设置里填写后，这个地址也在可访问范围内，代码里用 `mv.service` 读取。公网地址必须是 https；内网地址需要管理员勾选「允许访问这个内网服务」。
+
+## permissions.muvyo 使用 Muvyo 的服务
+
+插件可以请 Muvyo 用用户已经配好的实例执行只读查询，不需要用户再给插件填写这些账号。
+
+```json
+"permissions": {
+  "domains": [],
+  "muvyo": ["library.lookup", "telegram.search", "share.inspect"]
+}
+```
+
+| 可选值 | 用途 |
+|---|---|
+| `library.lookup` | 按 TMDB 编号查询媒体库 |
+| `telegram.search` | 搜索用户配置的公开 / 私有 Telegram 频道 |
+| `share.inspect` | 读取网盘分享是否有效与第一页文件信息，不转存 |
+
+- `muvyo` 可省略，默认空数组；最多 3 项，只声明实际需要的服务。未知名称或重复项都会拒绝安装。
+- 声明不等于授权。管理员在安装确认窗口的「使用 Muvyo 的服务」确认后才生效，运行时用 `mv.can(name)` 判断。
+- 更新新增的服务会标为「新增」，必须确认更新后才能使用；确认前仍只有原来的授权。新版本不再声明的服务随更新收回。
+- 服务授权与 `domains` / `service` 的联网权限分别声明；获得服务授权不代表能直接访问 Muvyo 的账号接口。
+- **兼容性：旧版 Muvyo 会拒绝安装声明了 `permissions.muvyo` 的插件。** 在代码里检测 `mv.can` 不能绕过安装校验。
+
+参数、结果与用量见 [运行环境：使用 Muvyo 的服务](runtime.md#使用-muvyo-的服务)，完整示例见 [已入库标记搜索](../examples/library-badge-demo/)。
 
 ## config 配置项
 

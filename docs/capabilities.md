@@ -11,6 +11,8 @@
 - [webhook 事件](#webhook-事件) — 接收 Muvyo 自己的事件，返回值被忽略
 - [naming 整理命名（待发布）](naming.md) — 独立协议；返回对象或 `null`，未知字段拒绝，不适用上面的单条丢弃规则
 
+除声明能力外，插件还可通过 `permissions.muvyo` 申请[使用 Muvyo 的服务](runtime.md#使用-muvyo-的服务)：查询媒体库、搜索 Telegram 频道、检查网盘分享，管理员确认后生效（命名调用不可用）。
+
 ---
 
 ## search 资源搜索

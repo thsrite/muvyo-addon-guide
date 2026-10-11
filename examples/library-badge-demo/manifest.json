@@ -1,0 +1,16 @@
+{
+  "api": 1,
+  "id": "alice.library-badge",
+  "name": "已入库标记搜索示例",
+  "version": "1.0.0",
+  "author": "alice",
+  "description": "搜索自建服务，用 Muvyo 媒体库查询为结果添加已入库标签；未授权或查询失败时保留原结果。",
+  "permissions": {
+    "domains": [],
+    "service": {"label": "搜索服务地址", "help": "你自己部署、提供 /search 接口的服务地址"},
+    "muvyo": ["library.lookup"]
+  },
+  "capabilities": {
+    "search": {"link_types": ["115", "magnet"], "supports_tmdb": false}
+  }
+}

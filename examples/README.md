@@ -3,6 +3,7 @@
 | 目录 | 插件 ID | 能力 | 说明 |
 |---|---|---|---|
 | [search-demo](search-demo/) | `alice.search` | search | 对接自建搜索服务，含 TMDB 精确搜索 |
+| [library-badge-demo](library-badge-demo/) | `alice.library-badge` | search | 自建搜索结果按 TMDB 查询媒体库，标记「已入库」，未授权时降级 |
 | [vlib-demo](vlib-demo/) | `alice.picks` | vlib | 虚拟库片单，不联网，可以直接签名安装试用 |
 | [content-demo](content-demo/) | `alice.content` | content | 连接自建内容服务，在 Vyo 里浏览播放 |
 | [metadata-demo](metadata-demo/) | `alice.meta` | metadata | 刮削来源 |

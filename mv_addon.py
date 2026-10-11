@@ -16,6 +16,26 @@
 README.md、signature.json）。只上传这些加密签名产物，不上传 src、明文代码或签名凭据。
 源码留在本地或独立私有开发仓库；发布流程不使用 --no-encrypt。Muvyo 里添加插件仓库地址就能安装。
 凭据里有签名私钥：妥善保管，不要提交到仓库或发给别人；丢了就在 Muvyo 里重新领取，旧证书签过的插件照样有效。
+
+使用 Muvyo 的服务（permissions.muvyo）：
+  请 Muvyo 用用户已经配好的实例办事，插件不用自己再要账号。manifest 里声明要用的服务：
+    "permissions": {"domains": [], "muvyo": ["library.lookup", "telegram.search", "share.inspect"]}
+  管理员安装 / 更新时逐项确认后才生效；新版本新增的服务在确认更新前用不了。凭据和登录会话不进沙箱，
+  插件只拿到下面这些结果。mv.can('library.lookup') 判断这一项是否已授权，没授权的调用会抛出异常。
+  命名插件与「测试运行环境」时不能使用。
+    mv.library.lookup({tmdb_id: 1399, type: 'tv', season: 1})        查媒体库（Emby / Jellyfin / Plex / Vyo 合并）
+      tmdb_id、season 必须是数字（'1399' 这样的字符串会被拒绝）。
+      → {tmdb_id, type, exists, complete, season, episodes: [1, 2, ...]}；电影没有 season / episodes。
+      也可以一次传一组（最多 20 部），按顺序返回一组。complete=false 表示有媒体服务器没答上来。
+    mv.telegram.search({keyword: '示例', limit: 20})                  搜用户配置的公开 / 私有频道（limit 1–50）
+      → {items: [{channel, date, title, text, share_link?, pan_type?, share_code?, magnets?}], failed}
+      只搜频道，不经搜索机器人；failed 为没搜成的频道数。
+    mv.share.inspect({url: 'https://115.com/s/xxxx', code: 'ab12'})   用同一家网盘的账号读分享（不转存）
+      → {valid: true, drive, title, total, files: [{name, size, dir}]}（第一页，最多 100 个）
+      或 {valid: false, drive, reason}（reason 为「分享已失效」「提取码不对」）；读取失败会抛异常，不代表分享无效。
+  上限：每次调用 library.lookup 5 次、telegram.search 2 次、share.inspect 5 次；每个插件每分钟
+  查 200 部 / 搜 6 次 / 读 12 次，所有插件另有合计上限；同一部片、关键词、分享短时间内重复查询直接用上次的结果。参数多给字段、类型不对都会被拒绝。
+  别把查询结果原样写进日志。
 """
 import argparse
 import base64

@@ -303,6 +303,11 @@ Vyo 媒体库的扫描设置里可以把「资料来源」改成插件（插件�
   status: "Ended",
   poster: "https://...",            // 图片只接受 https
   backdrop: "https://...",
+  images: {                         // 可选：「编辑图片」里的备选图，每类最多 30 张
+    posters: ["https://..."],
+    backdrops: ["https://..."],
+    logos: ["https://..."]
+  },
   image_headers: { "Referer": "https://example.com/" },
   people: [
     { name: "张三", role: "李四", type: "Actor" }   // type：Actor / Director / Writer / Producer / Crew
@@ -319,7 +324,9 @@ Vyo 媒体库的扫描设置里可以把「资料来源」改成插件（插件�
 }
 ```
 
-图片只记下地址，展示时由 Muvyo 按插件的联网权限取回并缓存，所以图片域名也要写进 `permissions.domains`。取图请求头不能带 `Cookie`、`Authorization` 等凭据类头。
+图片只记下地址，展示时由 Muvyo 按插件的联网权限取回并缓存，所以图片域名也要写进 `permissions.domains`。
+
+`images` 里的备选图不会自动用作封面，只在管理员打开 Vyo「编辑图片 → 搜索在线海报 / 背景 / 徽标」时，与 `poster`、`backdrop`、季海报和单集剧照一起列出供挑选；没给也能用，只是可选的图少。重复地址、非 https 地址会被丢掉。取图请求头不能带 `Cookie`、`Authorization` 等凭据类头。
 
 ---
 

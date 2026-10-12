@@ -40,6 +40,8 @@ function metadataDetail(args) {
     countries: d.countries || [],
     poster: d.poster || '',
     backdrop: d.backdrop || '',
+    // 可选：给「编辑图片」多几张备选
+    images: { posters: d.posters || [], backdrops: d.fanarts || [] },
     people: [
       ...(d.directors || []).map((p) => ({ name: p.name, type: 'Director' })),
       ...(d.cast || []).map((p) => ({ name: p.name, role: p.character || '', type: 'Actor' })),

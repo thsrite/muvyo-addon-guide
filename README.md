@@ -16,6 +16,7 @@
 | `metadata` 刮削来源 | Vyo 媒体库补全资料、重新识别时可改用插件 | `metadataSearch`、`metadataDetail` |
 | `naming` 整理命名（待发布） | 为整理命名方案提供字段格式化和相对路径建议，不操作文件 | `naming` |
 | `webhook` Muvyo 事件 | 上传、整理、STRM、订阅、下载、备份等完成或失败时收到通知 | `webhookEvent` |
+| `mascot` 慕慕形象 | 替换慕慕 AI 助手的名字和 / 或立绘，能力不变 | 无，只在清单里声明，立绘随包签名 |
 
 一个插件可以同时声明多种能力。详细的参数和返回格式见 [docs/capabilities.md](docs/capabilities.md)。
 

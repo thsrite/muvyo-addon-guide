@@ -49,7 +49,7 @@
 | `permissions` | 否 | 联网权限与使用 Muvyo 的服务，见下 |
 | `config` | 否 | 配置项，最多 30 个，见下 |
 | `settings` | 否 | 设置页的说明、链接与分组，见下 |
-| `capabilities` | 是 | 至少声明一种能力，见 [capabilities.md](capabilities.md) |
+| `capabilities` | 是 | 至少声明一种能力，见 [capabilities.md](capabilities.md)；`mascot` 的立绘也是包内图片，规则见 [mascot 慕慕形象](capabilities.md#mascot-慕慕形象) |
 
 ## icon 插件图标
 

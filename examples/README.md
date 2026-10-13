@@ -9,6 +9,7 @@
 | [metadata-demo](metadata-demo/) | `alice.meta` | metadata | 刮削来源 |
 | [naming-demo](naming-demo/) | `alice.naming` | naming（待发布） | 字段格式化、原模板渲染与 JS 正则替换；不操作文件 |
 | [webhook-demo](webhook-demo/) | `alice.eventlog` | webhook | 记录整理、订阅、下载事件到日志，不联网 |
+| [mascot-demo](mascot-demo/) | `alice.mascot` | mascot | 把慕慕换成橘猫「小橘」：名字 + 4 个动作的立绘，不联网、无逻辑 |
 
 命名示例需要支持 `naming` 与 `mv.render` 的新版 Muvyo；主程序能力尚未发布，旧版不能安装使用。这里只提供未签名教学源码，不发布可安装插件。
 

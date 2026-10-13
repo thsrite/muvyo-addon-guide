@@ -9,6 +9,7 @@
 - [content 内容源](#content-内容源)
 - [metadata 刮削来源](#metadata-刮削来源)
 - [webhook 事件](#webhook-事件) — 接收 Muvyo 自己的事件，返回值被忽略
+- [mascot 慕慕形象](#mascot-慕慕形象) — 只在清单里声明名字与包内立绘，不需要写函数
 - [naming 整理命名（待发布）](naming.md) — 独立协议；返回对象或 `null`，未知字段拒绝，不适用上面的单条丢弃规则
 
 除声明能力外，插件还可通过 `permissions.muvyo` 申请[使用 Muvyo 的服务](runtime.md#使用-muvyo-的服务)：查询媒体库、搜索 Telegram 频道、检查网盘分享，管理员确认后生效（命名调用不可用）。
@@ -395,3 +396,65 @@ Muvyo 自己的上传、STRM 生成、同步与扫描、整理、订阅、下载
 - 字段缺失是常态（例如订阅搜索失败可能没有片名），用之前先判断。
 
 示例见 [examples/webhook-demo](../examples/webhook-demo/)。
+
+---
+
+## mascot 慕慕形象
+
+替换 Muvyo 慕慕 AI 助手的**名字**和 / 或**立绘**。慕慕的能力、权限和对话方式都不变。不需要写任何函数，也不需要联网权限：名字和图片都在清单与插件包里，和代码一起签名。需要 Muvyo 3.11.1 或更新版本。
+
+管理员安装并启用插件后，要到「设置中心 → 插件 → 慕慕 AI 助手」的「慕慕」区块，把「慕慕形象」选成你的插件才生效。所有管理员看到的是同一个形象。插件被停用、删除、授权失效或被官方停用时，界面和 AI 的自称都自动回到官方慕慕。
+
+### 声明
+
+```json
+"capabilities": {
+  "mascot": {
+    "name": "小橘",
+    "frames": {
+      "idle": "mascot-idle.png",
+      "idle_blink": "mascot-blink.png",
+      "idle_talk": "mascot-talk.png",
+      "waveA": "mascot-wave.png"
+    }
+  }
+}
+```
+
+`name` 和 `frames` 至少给一个：
+
+- **只给 `name`**：界面沿用官方立绘，只改名字。
+- **只给 `frames`**：仍叫慕慕。
+
+### name 名字
+
+- 1–12 个字，只能用汉字、字母、数字、空格、间隔号 `·` 与短横线 `-`。下划线和标点不行。
+- 名字会显示在对话框标题、开场白和各处提示文字里。AI 回复时也用这个名字自称：系统提示词里的「你是慕慕」会换成「你是小橘」，所以名字限制得很严。
+
+### frames 立绘
+
+按动作给出包内图片的文件名。可用的动作，以及缺失时依次改用的动作：
+
+| 动作 | 用途 | 缺失时改用 |
+|---|---|---|
+| `idle` | 待机（**必填**），也用作对话框头像 | — |
+| `idle_blink` | 眨眼 | `idle` |
+| `idle_talk` | 说话 | `idle` |
+| `look_left` | 看左边 | `idle` |
+| `look_upleft` | 看左上 | `look_left` → `idle` |
+| `look_right` | 看右边 | `idle` |
+| `waveA` / `waveB` | 挥手的两帧 | 另一帧 → `idle` |
+| `point_left` | 指向左边（带路时） | `look_left` → `idle` |
+| `popcorn` | 吃爆米花（闲置时） | `sitsmile` → `idle` |
+| `thumbs` | 点赞（完成时） | `waveA` → `waveB` → `idle` |
+| `jump` | 跳起 | `idle` |
+| `crouch` | 蹲下 | `sitsmile` → `idle` |
+| `sitsmile` | 坐着笑 | `idle` |
+
+- 每张都是插件目录内的静态 PNG 或 WebP。文件名仅限英文字母、数字、短横线、下划线，首字符为字母或数字，扩展名小写。不接受外部地址、子目录、SVG、GIF 或动画；扩展名必须与实际格式一致。
+- 单张不超过 512 KiB、宽高各不超过 2048 像素。每个动作用不同的文件，不能与入口文件、图标、`README.md` 同名。整个插件包不超过 8 MiB。
+- Muvyo 验签后把每张放进 320×480 的透明画布（等比缩放、底边居中），重新编码为 WebP，并去掉附加数据与元信息。所以建议直接按 320×480、透明背景制作，人物脚底贴着画面下沿，各动作用同一比例，切换时才不会跳动。
+- 图片与清单、代码一起纳入作者签名，签名后不能直接替换图片。带立绘签名需要 `pip3 install cryptography Pillow`，并使用新版签名脚本：从新版 Muvyo 的「第三方插件 → 开发者」下载，或使用本仓库根目录的 `mv_addon.py`。
+- 插件包必须有一个入口文件。只做形象的插件可以放一个空的 `main.js`。
+
+示例见 [examples/mascot-demo](../examples/mascot-demo/)。

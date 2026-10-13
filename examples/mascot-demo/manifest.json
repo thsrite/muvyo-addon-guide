@@ -1,0 +1,22 @@
+{
+  "api": 1,
+  "id": "alice.mascot",
+  "name": "示例助手形象",
+  "version": "1.0.0",
+  "author": "alice",
+  "description": "把慕慕换成橘猫「小橘」：只换名字和立绘，不联网，也不运行任何逻辑。",
+  "entry": "main.js",
+  "min_mv_version": "3.11.1",
+  "permissions": {"domains": []},
+  "capabilities": {
+    "mascot": {
+      "name": "小橘",
+      "frames": {
+        "idle": "mascot-idle.png",
+        "idle_blink": "mascot-blink.png",
+        "idle_talk": "mascot-talk.png",
+        "waveA": "mascot-wave.png"
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "api": 1,
+  "id": "alice.channel-push",
+  "name": "示例频道推送",
+  "version": "1.0.0",
+  "min_mv_version": "3.13.0",
+  "author": "alice",
+  "description": "用 Muvyo 登录的 Telegram 账号读取频道：搜索时在频道里找资源，定时读取新消息并推送给订阅，分类浏览里按频道看。",
+  "permissions": {
+    "domains": [],
+    "muvyo": ["telegram.channel", "subscription.push"]
+  },
+  "config": [
+    {"key": "channels", "label": "公开频道", "type": "textarea", "placeholder": "@example_channel",
+     "help": "公开频道或公开超级群的用户名，每行一个，带不带 @ 都行。私有频道在下方「可读取的频道和群组」里勾选"},
+    {"key": "limit", "label": "每个频道条数", "type": "number", "default": "20", "min": 5, "max": 100, "step": 1, "unit": "条",
+     "help": "搜索时每个频道最多取多少条消息"}
+  ],
+  "capabilities": {
+    "search": {"link_types": ["magnet"], "supports_tmdb": false, "resolve": true},
+    "browse": {"label": "频道"},
+    "tasks": [
+      {"id": "live", "title": "监听新消息", "description": "读取各频道的新消息，把其中的资源推送给订阅", "kind": "watch", "interval_minutes": 2}
+    ]
+  }
+}

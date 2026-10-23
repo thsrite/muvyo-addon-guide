@@ -47,6 +47,25 @@ res.proxied      // 这次实际是否经了系统代理
 - 没设置 `User-Agent` 时默认带 `Muvyo-Addon/1`；`Host`、`Content-Length`、`Connection` 等请求头会被去掉。
 - 网络失败、超时、不允许的地址都会抛异常，需要容错就 `try/catch`。
 
+### mv.fetchAll(requests)
+
+一组请求由 Muvyo 同时发出，适合同时读多个频道、多个分页（Muvyo 3.13.2 起，`min_mv_version` 写 `3.13.2`，或先判断 `typeof mv.fetchAll === 'function'`，没有时逐个 `mv.fetch`）：
+
+```js
+const pages = mv.fetchAll([
+  { url: 'https://t.me/s/channel_a?q=' + encodeURIComponent(q.keyword), timeout: 20, proxy: true },
+  { url: 'https://t.me/s/channel_b?q=' + encodeURIComponent(q.keyword), timeout: 20, proxy: true },
+]);
+for (const res of pages) {
+  if (res.error) continue;        // 这一个失败：{ error: '原因' }，其它照常返回
+  // res 与 mv.fetch 的返回值相同：status、headers、body、url…
+}
+```
+
+- 每项的写法与 `mv.fetch` 相同（也可以直接传地址字符串），按传入顺序返回；一批 1–8 个，最多 4 个同时进行。
+- 某一项失败（超时、不允许的地址、网络错误）只在那一项返回 `{ error }`，不会整批抛错；传的不是数组、或超过 8 个时整次调用抛错。
+- 每个请求照样计入「一次调用最多 30 个请求」和每分钟用量，校验、代理、跳转规则与 `mv.fetch` 完全一样；整批响应正文合计不超过 6 MB，超出的项按失败返回。
+
 ## 使用 Muvyo 的服务
 
 在 [manifest](manifest.md#permissionsmuvyo-使用-muvyo-的服务) 的 `permissions.muvyo` 声明所需服务，管理员安装 / 更新确认后，插件可请 Muvyo 用已配置的实例办下面这些事。接口同步返回，不需要 `await`，也不需要插件持有这些实例的凭据。

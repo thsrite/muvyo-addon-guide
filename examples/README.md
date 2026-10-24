@@ -3,6 +3,7 @@
 | 目录 | 插件 ID | 能力 | 说明 |
 |---|---|---|---|
 | [search-demo](search-demo/) | `alice.search` | search、account | 查询上下文、完结剧集、获取错误、秒传、请求预算与账号信息 |
+| [torrent-demo](torrent-demo/) | `alice.torrent` | search（种子能力待发布） | 只使用基础宿主接口，演示种子文件搜索与按需获取 |
 | [library-badge-demo](library-badge-demo/) | `alice.library-badge` | search | 自建搜索结果按 TMDB 查询媒体库，标记「已入库」，未授权时降级 |
 | [vlib-demo](vlib-demo/) | `alice.picks` | vlib | 虚拟库片单，不联网，可以直接签名安装试用 |
 | [content-demo](content-demo/) | `alice.content` | content | 连接自建内容服务，在 Vyo 里浏览播放 |
@@ -28,7 +29,7 @@ python3 mv_addon.py sign ./src/<你的用户名>.picks -o .
 
 ## 权限与最低版本
 
-所有示例都需要 **Muvyo 3.13.0 或更新版本**，manifest 已写好 `min_mv_version`。接口、频道、文件、作品均为教学占位，实际使用前替换为自己有权使用的内容。
+除明确标为待发布的能力外，示例需要 **Muvyo 3.13.0 或更新版本**，manifest 写有 `min_mv_version`。`torrent-demo` 需要包含种子下载能力的开发代码，正式最低版本待发布时确认；`search-demo` 中的种子分支也有同样要求。接口、频道、文件、作品均为教学占位，实际使用前替换为自己有权使用的内容。
 
 | 示例 | 所需 permissions |
 |---|---|

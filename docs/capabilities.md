@@ -41,7 +41,7 @@
 
 | 字段 | 说明 |
 |---|---|
-| `link_types` | 会返回的资源类型：`115`、`123pan`、`baidupan`、`guangyapan`、`aliyundrive`、`cloud189`、`magnet`、`ed2k`；返回 123 秒传清单的写 `123pan` |
+| `link_types` | 会返回的资源类型：`115`、`123pan`、`baidupan`、`guangyapan`、`aliyundrive`、`cloud189`、`magnet`、`ed2k`；返回 123 秒传清单的写 `123pan`；新增 `torrent` 种子文件能力见下文版本说明 |
 | `supports_tmdb` | 能按 TMDB 编号精确搜索时设为 `true`，Muvyo 会把它的结果当作精确匹配 |
 | `resolve` | 搜索结果先不给链接、用户选中后再换取链接时设为 `true`，并实现 `resolve` |
 | `resolve_cost` | 来源站点自身是否按积分计费：`none` 或 `points` |
@@ -162,6 +162,27 @@
 ```
 
 消息的其余内容不会交给插件。返回值与 `search` 相同（`{ items: [...] }`，同一套校验）：只有一条时，免费的直接转存或离线下载，要积分或 `cost_unknown` 的先问用户；有多条时机器人列出结果让用户选。不是自己能解析的链接返回 `{ items: [] }`。
+
+### 种子文件下载（新增能力，待随 Muvyo 发版）
+
+已付费种子的临时凭据失效后不会自动再次购买。用户在网页重新获取同一条目后，后续订阅可使用新凭据恢复；插件应为同一资源保持稳定的 `id`。任务统一在「BT 下载器」插件中管理，搜索卡片提供「查看下载任务」入口。
+
+种子内部只允许公网 tracker 地址，保留合法私有 tracker 的参数；含额外 HTTP 下载源（web seed）、初始节点或内网地址的种子会被拒绝，不会静默改写种子。下载站的 gzip / deflate 响应会先解压，4 MiB 上限按解压后计算。插件停用、卸载或吊销时，正在连接或读取的种子下载会立即取消。
+
+搜索能力的 `link_types` 可声明 `torrent`。搜索条目写 `link_type: "torrent"`，直接给 `torrent`，或先给 `resolve_token`，由 `resolve` 返回：
+
+```js
+{ torrent: {
+    url: "https://example.com/download/123.torrent",
+    headers: { Authorization: "Bearer example-token" }
+} }
+```
+
+`url` 为原始种子文件的 HTTP(S) GET 地址，最长 4096 字符；可选 `headers` 最多 20 项、合计最多 8192 字符，仅用于下载种子。地址须属于插件获准的域名或配置的服务地址，跳转逐跳校验、跨来源去掉认证头。需要 POST 换链接的站点先在 `resolve` 完成换取，最终返回 GET 地址。不要将种子二进制塞进文本 `body`。
+
+同一条同时给种子与其他资源时，以种子为准。搜索只保存下载描述，不访问种子地址；用户点击下载或订阅选中后由 Muvyo 取回并验证，原始字节上传到已配置的 qBittorrent / aria2。支持最大 4 MiB 的 BT v1 / 混合种子，纯 v2 暂不支持。目标网盘必须能上传且配置了保存目录，需开启 BT 下载器对应的接入开关。即使目标有原生离线能力，种子仍走本地下载器；磁力的既有行为不变。
+
+下载描述只留在服务端一小时的有界缓存内；网页仅获得绑定用户与用途的加密引用。过期、重启或插件变更后重新搜索；付费结果不会因引用失效自动重复购买。基础示例见 [torrent-demo](../examples/torrent-demo/README.md)，综合示例见 [search-demo](../examples/search-demo/README.md)。此能力尚未发布，发布前不要将旧版最低版本声明当成已支持。
 
 ### resolve({ token })
 

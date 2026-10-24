@@ -1,0 +1,18 @@
+{
+  "api": 1,
+  "id": "alice.torrent",
+  "name": "种子文件搜索示例",
+  "version": "1.0.0",
+  "author": "alice",
+  "description": "返回种子下载地址与站点请求头，由 Muvyo 下载原始种子并提交给 BT 下载器。",
+  "permissions": {
+    "domains": [],
+    "service": {"label": "搜索服务地址", "help": "填写自己部署的服务地址，例如 https://example.com"}
+  },
+  "config": [
+    {"key": "api_key", "label": "服务密钥", "type": "secret", "help": "用于搜索与获取下载信息；服务未设置密钥时留空"}
+  ],
+  "capabilities": {
+    "search": {"link_types": ["torrent"], "resolve": true, "resolve_cost": "none"}
+  }
+}

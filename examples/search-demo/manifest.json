@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "min_mv_version": "3.13.0",
   "author": "alice",
-  "description": "资源搜索与账号信息示例：调用自建服务，演示磁力、123 秒传、待获取资源与完结剧集。",
+  "description": "资源搜索与账号信息示例：调用自建服务，演示磁力、种子文件、123 秒传、待获取资源与完结剧集。",
   "permissions": {
     "domains": [],
     "service": {"label": "搜索服务地址", "help": "你自己部署的搜索服务，例如 https://example.com"}
@@ -20,7 +20,7 @@
     "sections": [{"title": "服务", "fields": ["api_key", "size"]}]
   },
   "capabilities": {
-    "search": {"link_types": ["magnet", "123pan"], "supports_tmdb": true, "resolve": true, "resolve_cost": "points", "modes": ["completed"]},
+    "search": {"link_types": ["magnet", "torrent", "123pan"], "supports_tmdb": true, "resolve": true, "resolve_cost": "points", "modes": ["completed"]},
     "account": {"title": "示例账号"}
   }
 }

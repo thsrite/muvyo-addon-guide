@@ -29,15 +29,28 @@ function toItem(row) {
     item.rapid_links = String(row.rapid_links || '');
   } else if (row.type === 'magnet') {
     item.magnets = [row.link];
+  } else if (row.type === 'torrent') {
+    // 返回种子的下载信息，由 Muvyo 按插件联网权限取回二进制，再上传给下载器。
+    // 不要用 mv.fetch(...).body 接种子：body 是文本，会破坏二进制内容。
+    item.torrent = torrentDownload(row.torrent);
   }
   return item;
+}
+
+function torrentDownload(data) {
+  if (!data || !data.url) throw new Error('服务没有返回种子下载地址');
+  return {
+    url: String(data.url),
+    // 只带插件自己的站点凭据，不需要也不能读取 Muvyo 的 qB 账号密码。
+    headers: data.headers || {},
+  };
 }
 
 function search(q) {
   const completed = q.mode === 'completed';
   if (!completed && !q.tmdb_id && !String(q.keyword || '').trim()) return { items: [] };
-  const targets = Array.isArray(q.link_types) ? q.link_types : ['magnet', '123pan'];
-  if (!targets.some(t => t === 'magnet' || t === '123pan')) return { items: [] };
+  const targets = Array.isArray(q.link_types) ? q.link_types : ['magnet', 'torrent', '123pan'];
+  if (!targets.some(t => t === 'magnet' || t === 'torrent' || t === '123pan')) return { items: [] };
   const body = {
     keyword: q.keyword || '', tmdb_id: q.tmdb_id || 0, type: q.media_type || '',
     season: q.season, year: q.year || 0, purpose: q.purpose || 'manual',
@@ -87,6 +100,7 @@ function resolve(args) {
     }
     if (res.status !== 200) return { error: { kind: 'uncertain', message: '请求已发出，可能已扣分，请核对' } };
     const data = JSON.parse(res.body);
+    if (data.torrent) return { torrent: torrentDownload(data.torrent) };
     if (data.rapid_links) return { rapid_links: data.rapid_links };
     if (Array.isArray(data.magnets) && data.magnets.length) return { magnets: data.magnets };
     return { error: { kind: 'uncertain', message: '响应缺少链接，请核对是否已扣分' } };

@@ -86,6 +86,7 @@
   - 不能填 Muvyo 自己的端口，也不能填 Muvyo 已接入的媒体服务器、下载器、HTTP 代理、FlareSolverr 等服务的地址；FlareSolverr 这类能替插件访问任意网址的服务，即使单独部署也不能作为服务地址。
 - `flaresolverr`：插件要经 FlareSolverr 打开有 Cloudflare 验证的网页时声明，写 `{}` 或 `{"help": "说明文字（≤300 字）"}`。用户在插件设置里填 FlareSolverr 地址，插件用 [`mv.flaresolverr`](runtime.md#mvflaresolverr) 请 Muvyo 代为打开，插件本身连不到 FlareSolverr。
 - `tls_pins`：要连接使用自签证书的服务器时声明（例如自建的中转），最多 5 条，每条 `{"host": "relay.example.com", "sha256": "证书 SHA-256"}`。主机必须写在 `domains` 里（https，不能是通配）；`sha256` 是服务器证书 DER 编码的 SHA-256（64 位十六进制，可带冒号，`openssl x509 -noout -fingerprint -sha256` 的输出）。这些主机不按 CA 校验，只认这张证书，对不上在发出请求前断开；服务器换了证书就要发新版本。确认安装窗口会列出固定的证书。
+- `tls_insecure`：服务器证书会变、没法固定时声明（Muvyo 3.13.7 起），最多 5 个主机名，例如 `["relay.example.com"]`。主机必须写在 `domains` 里（https，不能是通配），不能同时写进 `tls_pins`。连这些主机时接受任何证书，网络里有人冒充它就能拿走插件发过去的凭据；确认安装窗口会醒目列出「不校验证书」。能固定证书时优先用 `tls_pins`。
 
 ## permissions.muvyo 使用 Muvyo 的服务
 

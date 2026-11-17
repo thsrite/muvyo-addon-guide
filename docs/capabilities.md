@@ -488,6 +488,9 @@ Vyo 媒体库的扫描设置里可以把「资料来源」改成插件（插件�
   premiere_date: "2024-01-01",      // YYYY-MM-DD
   runtime: 45,                      // 分钟
   genres: ["剧情", "悬疑"],
+  tags: ["修复版"],                  // 新版通用资料扩展
+  official_rating: "PG-13",         // 内容分级，与下方评分 rating 不同
+  collections: [{ id: "series:42", name: "示例系列" }], // 可多个；省略保留，[] 移除
   rating: 8.1,
   vote_count: 1200,
   countries: ["中国"],

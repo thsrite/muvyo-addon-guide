@@ -16,6 +16,16 @@ function load(data) {
 }
 const plain = (value) => JSON.parse(JSON.stringify(value));
 
+test('合集标签和分级保留，未提供合集不误清空', () => {
+  const data = { title: '作品', tags: ['修复版'], official_rating: 'PG-13', collections: [{ id: 42, name: '系列' }] };
+  const detail = plain(load(data).context.metadataDetail({ id: 'work:7', media_type: 'movie' }));
+  assert.deepEqual(detail.collections, [{ id: '42', name: '系列' }]);
+  assert.deepEqual(detail.tags, ['修复版']);
+  assert.equal(detail.official_rating, 'PG-13');
+  assert.equal(load({ title: '旧服务' }).context.metadataDetail({ id: 'work:7' }).collections, null);
+  assert.deepEqual(plain(load({ title: '清空', collections: [] }).context.metadataDetail({ id: 'work:7' }).collections), []);
+});
+
 test('识别保留服务明确结果与文件名参数', () => {
   const { context, calls } = load({ status: 'matched', id: 'work:7', media_type: 'movie' });
   const args = { title: '作品', year: 2025, media_type: 'movie', filenames: ['编号 7.mkv'] };

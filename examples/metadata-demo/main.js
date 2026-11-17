@@ -35,6 +35,10 @@ function metadataDetail(args) {
     premiere_date: d.release_date || '',
     runtime: Number(d.runtime || 0),
     genres: d.genres || [],
+    // 新版通用字段；旧服务未返回合集时保留已有归属，不自动换成空数组。
+    tags: d.tags || [],
+    official_rating: d.official_rating || '',
+    collections: d.collections == null ? null : d.collections.map(c => ({ id: String(c.id), name: c.name })),
     rating: Number(d.rating || 0),
     vote_count: Number(d.votes || 0),
     countries: d.countries || [],

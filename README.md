@@ -14,7 +14,7 @@
 | `browse` 分类浏览 | 资源推荐的「分类浏览」里出现插件提供的来源（例如频道），Muvyo 认出作品后出卡片 | `browseSources`、`browsePage` |
 | `vlib` 虚拟库片单 | 作为虚拟库的动态来源，给出一组影片，资料由 Muvyo 从 TMDB 补全 | `vlibItems` |
 | `content` 内容源 | 接入用户自己部署的媒体服务（插件设置里填服务地址），在 Vyo 里按虚拟库浏览、播放这台服务上的内容 | `contentList`、`contentDetail`、`contentPlay`，可选 `contentCategories`、`contentSearch` |
-| `metadata` 刮削来源 | Vyo 媒体库补全资料、重新识别时可改用插件 | `metadataSearch`、`metadataDetail` |
+| `metadata` 刮削来源 | Vyo 媒体库补全资料、重新识别；可选作品识别、人物与图片请求扩展（待发布） | `metadataSearch`、`metadataDetail`，扩展见[资料协议](docs/metadata.md) |
 | `naming` 整理命名（待发布） | 为整理命名方案提供字段格式化和相对路径建议，不操作文件 | `naming` |
 | `webhook` Muvyo 事件 | 上传、整理、STRM、订阅、下载、备份等完成或失败时收到通知 | `webhookEvent` |
 | `mascot` 慕慕形象 | 替换慕慕 AI 助手的名字和 / 或立绘，能力不变 | 无，只在清单里声明，立绘随包签名 |

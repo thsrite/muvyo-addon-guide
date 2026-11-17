@@ -28,6 +28,12 @@ README.md、可选图标、signature.json）。只把这些加密签名产物推
 不支持目录、外链或 SVG。原图最多 256 KB、宽高各不超过 1024 像素；建议使用正方形透明底 PNG。
 带图标时先安装依赖：pip install cryptography Pillow。图标与代码一起签名，不需要额外联网权限；
 Muvyo 验签后统一转换成最长边 128 像素的 PNG 展示。没有图标或头像加载失败仍显示文字头像。
+刮削来源扩展（待发布）：capabilities.metadata 可选 identify、people、image_request，均默认 false。
+对应 metadataIdentify、metadataPeopleSearch / metadataPersonDetail、metadataImageRequest；
+作品详情可附人物编号、头像、简介与公开 HTTPS 预告片。完整契约见 docs/metadata.md。
+图片认证头只在当次请求使用，地址仍受联网权限约束；不要求特定资料来源或编号体系。
+启用扩展时 min_mv_version 按实际支持它的发布版本填写，不沿用基础示例的最低版本。
+
 慕慕形象：插件可以替换慕慕 AI 助手的名字和 / 或外观（能力不变），在 capabilities.mascot 里声明
 "name"（最多 12 个字，只能用汉字、字母、数字、空格、间隔号与短横线）与 / 或 "frames"。立绘动作名：idle（待机，必填）、idle_blink、
 idle_talk、look_left、look_upleft、look_right、waveA、waveB、point_left、popcorn、thumbs、jump、crouch、

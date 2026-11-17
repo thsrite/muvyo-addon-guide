@@ -7,7 +7,7 @@
 | [library-badge-demo](library-badge-demo/) | `alice.library-badge` | search | 自建搜索结果按 TMDB 查询媒体库，标记「已入库」，未授权时降级 |
 | [vlib-demo](vlib-demo/) | `alice.picks` | vlib | 虚拟库片单，不联网，可以直接签名安装试用 |
 | [content-demo](content-demo/) | `alice.content` | content | 连接自建内容服务，在 Vyo 里浏览播放 |
-| [metadata-demo](metadata-demo/) | `alice.meta` | metadata | 刮削来源 |
+| [metadata-demo](metadata-demo/) | `alice.meta` | metadata | 基础搜索与详情；可选作品识别、人物与图片请求扩展（待发布） |
 | [naming-demo](naming-demo/) | `alice.naming` | naming（待发布） | 字段格式化、原模板渲染与 JS 正则替换；不操作文件 |
 | [channel-push-demo](channel-push-demo/) | `alice.channel-push` | search、browse、tasks | 监听类任务、允许时段、本地时间、待获取资源推送与频道浏览 |
 | [webhook-demo](webhook-demo/) | `alice.eventlog` | webhook | 记录整理、订阅、下载事件到日志，不联网 |

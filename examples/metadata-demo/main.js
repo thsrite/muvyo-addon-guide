@@ -1,4 +1,4 @@
-// 刮削来源示例：站点接口与字段仅作演示。图片只接受 https，图片域名也要写进 permissions.domains。
+// 基础刮削示例：接口与字段仅作演示。为兼容旧版使用 HTTPS 图片，图片域名也要声明。
 const API = 'https://api.example.com';
 
 function get(path) {

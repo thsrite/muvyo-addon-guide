@@ -53,6 +53,8 @@
 | `settings` | 否 | 设置页的说明、链接与分组，见下 |
 | `capabilities` | 是 | 至少声明一种能力，见 [capabilities.md](capabilities.md)；`mascot` 的立绘也是包内图片，规则见 [mascot 慕慕形象](capabilities.md#mascot-慕慕形象) |
 
+资料来源的可选扩展声明为 `capabilities.metadata.identify`、`people`、`image_request`（布尔值，默认 `false`）。这些能力待发布，`api` 仍为 1；使用前按正式支持版本填写 `min_mv_version`，不要仅根据 `api: 1` 推断旧版可用。完整声明及入口见[资料协议](metadata.md)。
+
 ## icon 插件图标
 
 在插件目录放入图片，并在 `manifest.json` 添加 `"icon": "icon.png"`。使用支持图标的新版本签名脚本重新签名、发布；图标与清单一起纳入作者签名，不能在签名后直接替换图片。

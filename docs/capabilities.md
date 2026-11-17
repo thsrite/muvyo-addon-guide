@@ -466,7 +466,7 @@ Vyo 媒体库的扫描设置里可以把「资料来源」改成插件（插件�
       year: 2024,
       media_type: "movie",          // 必填：movie / tv
       overview: "简介",
-      poster: "https://img.example.com/p.jpg",   // 只接受 https
+      poster: "https://img.example.com/p.jpg",   // 新版支持 HTTP/HTTPS，仍受联网权限约束
       rating: 7.8,
       image_headers: { "Referer": "https://example.com/" }   // 可选：取图要带的请求头
     }
@@ -493,7 +493,7 @@ Vyo 媒体库的扫描设置里可以把「资料来源」改成插件（插件�
   countries: ["中国"],
   studios: ["示例影业"],
   status: "Ended",
-  poster: "https://...",            // 图片只接受 https
+  poster: "https://...",            // 新版支持 HTTP/HTTPS，仍受联网权限约束
   backdrop: "https://...",
   images: {                         // 可选：「编辑图片」里的备选图，每类最多 30 张
     posters: ["https://..."],
@@ -518,7 +518,13 @@ Vyo 媒体库的扫描设置里可以把「资料来源」改成插件（插件�
 
 图片只记下地址，展示时由 Muvyo 按插件的联网权限取回并缓存，所以图片域名也要写进 `permissions.domains`。
 
-`images` 里的备选图不会自动用作封面，只在管理员打开 Vyo「编辑图片 → 搜索在线海报 / 背景 / 徽标」时，与 `poster`、`backdrop`、季海报和单集剧照一起列出供挑选；没给也能用，只是可选的图少。重复地址、非 https 地址会被丢掉。取图请求头不能带 `Cookie`、`Authorization` 等凭据类头。
+`images` 里的备选图不会自动用作封面，只在管理员打开 Vyo「编辑图片 → 搜索在线海报 / 背景 / 徽标」时，与 `poster`、`backdrop`、季海报和单集剧照一起列出供挑选；没给也能用，只是可选的图少。重复地址、非法图片地址会被丢掉。静态 `image_headers` 不能带 `Cookie`、`Authorization` 等凭据类头。
+
+### 通用资料扩展（待发布）
+
+新增可选声明 `identify`、`people`、`image_request`，默认均为 `false`，`api` 仍为 1。分别对应 `metadataIdentify`、`metadataPeopleSearch` / `metadataPersonDetail`、`metadataImageRequest`；作品详情还可提供人物编号、头像、简介与公开预告片链接。完整入参、返回值、网络与权限边界见[通用资料协议](metadata.md)，可运行示例见 [metadata-demo/extensions.js](../examples/metadata-demo/extensions.js)。
+
+本节扩展及 HTTP 图片支持需要包含这些改动的新版宿主，正式最低版本待发布时确认。旧版仍只支持 HTTPS 图片；不要把原基础示例的 `min_mv_version: 3.13.0` 用作新能力的兼容承诺。
 
 ---
 
